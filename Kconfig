@@ -1,146 +1,317 @@
 menu "Amazon Web Services IoT Platform"
 
-config AWS_IOT_MQTT_HOST
-    string "AWS IoT Endpoint Hostname"
-    default ""
-    help
-        Default endpoint host name to connect to AWS IoT MQTT/S gateway
+choice
+    prompt "Global log level"
+    default AWS_IOT_LOG_LEVEL_GLOBAL_INFO
+config AWS_IOT_LOG_LEVEL_GLOBAL_NONE
+    bool "None"
+config AWS_IOT_LOG_LEVEL_GLOBAL_ERROR
+    bool "Error"
+config AWS_IOT_LOG_LEVEL_GLOBAL_WARN
+    bool "Warn"
+config AWS_IOT_LOG_LEVEL_GLOBAL_INFO
+    bool "Info"
+config AWS_IOT_LOG_LEVEL_GLOBAL_DEBUG
+    bool "Debug"
+endchoice
 
-        This is the custom endpoint hostname and is specific to an AWS
-        IoT account. You can find it by logging into your AWS IoT
-        Console and clicking the Settings button. The endpoint hostname
-        is shown under the "Custom Endpoint" heading on this page.
-
-        If you need per-device hostnames for different regions or
-        accounts, you can override the default hostname in your app.
-
-config AWS_IOT_MQTT_PORT
-    int "AWS IoT MQTT Port"
-    default 8883
-    range 0 65535
-    help
-        Default port number to connect to AWS IoT MQTT/S gateway
-
-        If you need per-device port numbers for different regions, you can
-        override the default port number in your app.
-
-
-config AWS_IOT_MQTT_TX_BUF_LEN
-    int "MQTT TX Buffer Length"
-    default 512
-    range 32 131072
-    help
-        Maximum MQTT transmit buffer size. This is the maximum MQTT
-        message length (including protocol overhead) which can be sent.
-
-        Sending longer messages will fail.
-
-config AWS_IOT_MQTT_RX_BUF_LEN
-    int "MQTT RX Buffer Length"
-    default 512
-    range 32 131072
-    help
-        Maximum MQTT receive buffer size. This is the maximum MQTT
-        message length (including protocol overhead) which can be
-        received.
-
-        Longer messages are dropped.
+config AWS_IOT_STATIC_MEMORY_ONLY
+    bool "Use static memory"
 
 
 
-config AWS_IOT_MQTT_NUM_SUBSCRIBE_HANDLERS
-    int "Maximum MQTT Topic Filters"
-    default 5
+menu "MQTT"
+config AWS_IOT_MQTT_ENABLE_ASSERTS
+    bool "Enable sanity checks"
+    default y
+
+config AWS_IOT_MQTT_ENABLE_METRICS
+    bool "Enable anonymous usage metrics"
+    default n
+
+config AWS_IOT_MQTT_ENABLE_SERIALIZER_OVERRIDES
+    bool "Use custom serializer functions"
+
+choice
+    prompt "Log level"
+    optional
+    default AWS_IOT_LOG_LEVEL_MQTT_INFO
+config AWS_IOT_LOG_LEVEL_MQTT_NONE
+    bool "None"
+config AWS_IOT_LOG_LEVEL_MQTT_ERROR
+    bool "Error"
+config AWS_IOT_LOG_LEVEL_MQTT_WARN
+    bool "Warn"
+config AWS_IOT_LOG_LEVEL_MQTT_INFO
+    bool "Info"
+config AWS_IOT_LOG_LEVEL_MQTT_DEBUG
+    bool "Debug"
+endchoice
+
+config AWS_IOT_MQTT_RESPONSE_WAIT_MS
+    int "Response wait (ms)"
+    default 10000
+    range 0 3600000
+
+config AWS_IOT_MQTT_RETRY_MS_CEILING
+    int "Retry Ceiling (ms)"
+    default 60000
+    range 0 3600000
+
+if AWS_IOT_STATIC_MEMORY_ONLY
+config MAX_CONNECTIONS
+    int "Max connections"
+    default 1
+    range 0 16
+
+config AWS_IOT_MQTT_MAX_IN_PROGRESS_OPERATIONS
+    int "Max in-progress operations"
+    default 10
+
+config AWS_IOT_MQTT_SUBSCRIPTIONS
+    int "Max subscriptions"
+    default 8
+endif  # AWS_IOT_STATIC_MEMORY
+endmenu  # MQTT
+
+
+
+menu "Thing Shadows"
+config AWS_IOT_SHADOW_ENABLE_ASSERTS
+    bool "Enable sanity checks"
+    default y
+
+config AWS_IOT_SHADOW_DEFAULT_MQTT_TIMEOUT_MS
+    int "MQTT Timeout (ms)"
+    default 5000
+    range 0 3600000
+
+choice
+    prompt "Log level"
+    default AWS_IOT_LOG_LEVEL_SHADOW_INFO
+config AWS_IOT_LOG_LEVEL_SHADOW_NONE
+    bool "None"
+config AWS_IOT_LOG_LEVEL_SHADOW_ERROR
+    bool "Error"
+config AWS_IOT_LOG_LEVEL_SHADOW_WARN
+    bool "Warn"
+config AWS_IOT_LOG_LEVEL_SHADOW_INFO
+    bool "Info"
+config AWS_IOT_LOG_LEVEL_SHADOW_DEBUG
+    bool "Debug"
+endchoice
+
+if AWS_IOT_STATIC_MEMORY_ONLY
+config AWS_IOT_SHADOW_MAX_IN_PROGRESS_OPERATIONS
+    int "Max in-progress operations"
+    default 10
     range 1 100
-    help
-        Maximum number of concurrent MQTT topic filters.
+
+config AWS_IOT_SHADOW_SUBSCRIPTIONS
+    int "Max subscriptions"
+    default 2
+    range 1 100
+endif  # AWS_IOT_STATIC_MEMORY
+endmenu  # Thing Shadows
 
 
-config AWS_IOT_MQTT_MIN_RECONNECT_WAIT_INTERVAL
-    int "Auto reconnect initial interval (ms)"
-    default 1000
-    range 10 3600000
-    help
-        Initial delay before making first reconnect attempt, if the AWS IoT connection fails.
-        Client will perform exponential backoff, starting from this value.
 
-config AWS_IOT_MQTT_MAX_RECONNECT_WAIT_INTERVAL
-    int "Auto reconnect maximum interval (ms)"
-    default 128000
-    range 10 3600000
-    help
-        Maximum delay between reconnection attempts. If the exponentially increased delay
-        interval reaches this value, the client will stop automatically attempting to reconnect.
+menu "Jobs"
+config AWS_IOT_JOBS_ENABLE_ASSERTS
+    bool "Enable sanity checks"
+    default y
 
-menu "Thing Shadow"
+config AWS_IOT_JOBS_DEFAULT_MQTT_TIMEOUT_MS
+    int "MQTT Timeout (ms)"
+    default 5000
+    range 0 3600000
 
-    config AWS_IOT_OVERRIDE_THING_SHADOW_RX_BUFFER
-        bool "Override Shadow RX buffer size"
-        default n
-        help
-            Allows setting a different Thing Shadow RX buffer
-            size. This is the maximum size of a Thing Shadow
-            message in bytes, plus one.
+choice
+    prompt "Log level"
+    default AWS_IOT_LOG_LEVEL_JOBS_INFO
+config AWS_IOT_LOG_LEVEL_JOBS_NONE
+    bool "None"
+config AWS_IOT_LOG_LEVEL_JOBS_ERROR
+    bool "Error"
+config AWS_IOT_LOG_LEVEL_JOBS_WARN
+    bool "Warn"
+config AWS_IOT_LOG_LEVEL_JOBS_INFO
+    bool "Info"
+config AWS_IOT_LOG_LEVEL_JOBS_DEBUG
+    bool "Debug"
+endchoice
 
-            If not overridden, the default value is the MQTT RX Buffer length plus one. If overriden, do not set
-            higher than the default value.
+if AWS_IOT_STATIC_MEMORY_ONLY
+config AWS_IOT_JOBS_MAX_IN_PROGRESS_OPERATIONS
+    int "Max in-progress operations"
+    default 10
+    range 1 100
 
-    config AWS_IOT_SHADOW_MAX_SIZE_OF_RX_BUFFER
-        int "Maximum RX Buffer (bytes)"
-        depends on AWS_IOT_OVERRIDE_THING_SHADOW_RX_BUFFER
-        default 513
-        range 32 65536
-        help
-            Allows setting a different Thing Shadow RX buffer size.
-            This is the maximum size of a Thing Shadow message in bytes,
-            plus one.
+config AWS_IOT_JOBS_SUBSCRIPTIONS
+    int "Max subscriptions"
+    default 2
+    range 1 100
+endif  # AWS_IOT_STATIC_MEMORY
+endmenu  # Jobs
 
 
-    config AWS_IOT_SHADOW_MAX_SIZE_OF_UNIQUE_CLIENT_ID_BYTES
-        int "Maximum unique client ID size (bytes)"
-        default 80
-        range 4 1000
-        help
-            Maximum size of the Unique Client Id.
 
-    config AWS_IOT_SHADOW_MAX_SIMULTANEOUS_ACKS
-        int "Maximum simultaneous responses"
-        default 10
-        range 1 100
-        help
-            At any given time we will wait for this many responses. This will correlate to the rate at which the
-            shadow actions are requested
+menu "Defender"
+config AWS_IOT_SECURE_SOCKETS_METRICS_ENABLED
+    bool "Enable Secure sockets metrics"
+    default n
 
-    config AWS_IOT_SHADOW_MAX_SIMULTANEOUS_THINGNAMES
-        int "Maximum simultaneous Thing Name operations"
-        default 10
-        range 1 100
-        help
-            We could perform shadow action on any thing Name and this is maximum Thing Names we can act on at any
-            given time
+choice
+    prompt "Default serialization format"
+config AWS_IOT_DEFENDER_FORMAT_CBOR
+    bool "CBOR"
+endchoice
 
-    config AWS_IOT_SHADOW_MAX_JSON_TOKEN_EXPECTED
-        int "Maximum expected JSON tokens"
-        default 120
-        help
-            These are the max tokens that is expected to be in the Shadow JSON document. Includes the metadata which
-            is published
+config AWS_IOT_DEFENDER_USE_LONG_TAG
+    bool "Use long tag"
+    default n
 
-    config AWS_IOT_SHADOW_MAX_SHADOW_TOPIC_LENGTH_WITHOUT_THINGNAME
-        int "Maximum topic length (not including Thing Name)"
-        default 60
-        range 10 1000
-        help
-            All shadow actions have to be published or subscribed to a topic which is of the format
-            $aws/things/{thingName}/shadow/update/accepted. This refers to the size of the topic without the Thing
-            Name
+config AWS_IOT_DEFENDER_DEFAULT_PERIOD_SECONDS
+    int "Default period (s)"
+    default 300
+    range 1 86400
 
-    config AWS_IOT_SHADOW_MAX_SIZE_OF_THING_NAME
-        int "Maximum Thing Name length"
-        default 20
-        range 4 1000
-        help
-            Maximum length of a Thing Name.
+config AWS_IOT_DEFENDER_WAIT_SERVER_MAX_SECONDS
+    int "Max server wait (s)"
+    default 3
+    range 1 3600
 
-endmenu  # Thing Shadow
+config AWS_IOT_DEFENDER_MQTT_CONNECT_TIMEOUT_SECONDS
+    int "Default MQTT connect timeout (s)"
+    default 10
+    range 1 3600
+
+config AWS_IOT_DEFENDER_MQTT_SUBSCRIBE_TIMEOUT_SECONDS
+    int "Default MQTT subscribe timeout (s)"
+    default 10
+    range 1 3600
+
+config AWS_IOT_DEFENDER_MQTT_PUBLISH_TIMEOUT_SECONDS
+    int "Default MQTT publish timeout (s)"
+    default 10
+    range 1 3600
+endmenu  # Defender
+
+
+
+menu "Containers"
+config AWS_IOT_CONTAINERS_ENABLE_ASSERTS
+    bool "Enable sanity checks"
+    default y
+endmenu  # Containers
+
+
+
+menu "Static Memory"
+if AWS_IOT_STATIC_MEMORY_ONLY
+config AWS_IOT_MESSAGE_BUFFERS
+    int "Number of message buffers"
+    default 8
+
+config AWS_IOT_MESSAGE_BUFFER_SIZE
+    int "Message buffer size"
+    default 1024
+endif  # AWS_IOT_STATIC_MEMORY_ONLY
+endmenu  # Static Memory
+
+
+
+menu "Task Pool"
+config AWS_IOT_TASKPOOL_ENABLE_ASSERTS
+    bool "Enable sanity checks"
+    default y
+
+config AWS_IOT_TASKPOOL_JOB_WAIT_TIMEOUT_MS
+    int "Wait timeout (ms)"
+    default 60000
+
+config AWS_IOT_TASKPOOL_JOBS_RECYCLE_LIMIT
+    int "Number of recycleable tasks"
+    default 8
+
+choice
+    prompt "Log level"
+    default AWS_IOT_LOG_LEVEL_TASKPOOL_NONE
+config AWS_IOT_LOG_LEVEL_TASKPOOL_NONE
+    bool "None"
+config AWS_IOT_LOG_LEVEL_TASKPOOL_ERROR
+    bool "Error"
+config AWS_IOT_LOG_LEVEL_TASKPOOL_WARN
+    bool "Warn"
+config AWS_IOT_LOG_LEVEL_TASKPOOL_INFO
+    bool "Info"
+config AWS_IOT_LOG_LEVEL_TASKPOOL_DEBUG
+    bool "Debug"
+endchoice
+endmenu  # Task Pool
+
+
+
+menu "Platform"
+choice
+    prompt "Platform log level"
+    default AWS_IOT_LOG_LEVEL_PLATFORM_NONE
+config AWS_IOT_LOG_LEVEL_PLATFORM_NONE
+    bool "None"
+config AWS_IOT_LOG_LEVEL_PLATFORM_ERROR
+    bool "Error"
+config AWS_IOT_LOG_LEVEL_PLATFORM_WARN
+    bool "Warn"
+config AWS_IOT_LOG_LEVEL_PLATFORM_INFO
+    bool "Info"
+config AWS_IOT_LOG_LEVEL_PLATFORM_DEBUG
+    bool "Debug"
+endchoice
+
+choice
+    prompt "Network log level"
+    default AWS_IOT_LOG_LEVEL_NETWORK_INFO
+config AWS_IOT_LOG_LEVEL_NETWORK_NONE
+    bool "None"
+config AWS_IOT_LOG_LEVEL_NETWORK_ERROR
+    bool "Error"
+config AWS_IOT_LOG_LEVEL_NETWORK_WARN
+    bool "Warn"
+config AWS_IOT_LOG_LEVEL_NETWORK_INFO
+    bool "Info"
+config AWS_IOT_LOG_LEVEL_NETWORK_DEBUG
+    bool "Debug"
+endchoice
+
+config AWS_IOT_THREAD_DEFAULT_STACK_SIZE
+    int "Default Thread Stack Size"
+    default 6000
+
+config AWS_IOT_THREAD_DEFAULT_PRIORITY
+    int "Default Thread Priority"
+    default "5"
+endmenu  # Platform
+
+
+
+menu "Serializer"
+if AWS_IOT_STATIC_MEMORY_ONLY
+config AWS_IOT_SERIALIZER_CBOR_ENCODERS
+    int "Number of CBOR encoders"
+    default 10
+
+config AWS_IOT_SERIALIZER_CBOR_PARSERS
+    int "Number of CBOR parsers"
+    default 10
+
+config AWS_IOT_SERIALIZER_CBOR_VALUES
+    int "Number of CBOR values"
+    default 10
+
+config AWS_IOT_SERIALIZER_DECODER_OBJECTS
+    int "Number of decoder objects"
+    default 10
+endif  # AWS_IOT_STATIC_MEMORY
+endmenu  # Serializer
+
 endmenu  # AWS IoT
