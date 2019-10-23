@@ -31,7 +31,7 @@
 #ifndef _IOT_PLATFORM_TYPES_AFR_H_
 #define _IOT_PLATFORM_TYPES_AFR_H_
 
-#include "timers.h"
+#include "freertos/timers.h"
 
 typedef struct iot_mutex_internal
 {

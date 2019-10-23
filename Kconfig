@@ -3,6 +3,8 @@ menu "Amazon Web Services IoT Platform"
 choice
     prompt "Global log level"
     default AWS_IOT_LOG_LEVEL_GLOBAL_INFO
+    help
+        Set a default log level.
 config AWS_IOT_LOG_LEVEL_GLOBAL_NONE
     bool "None"
 config AWS_IOT_LOG_LEVEL_GLOBAL_ERROR
@@ -17,6 +19,9 @@ endchoice
 
 config AWS_IOT_STATIC_MEMORY_ONLY
     bool "Use static memory"
+    help
+        Set to disable the use of dynamic memory except for within the
+        platform code.
 
 
 
@@ -24,18 +29,27 @@ menu "MQTT"
 config AWS_IOT_MQTT_ENABLE_ASSERTS
     bool "Enable sanity checks"
     default y
+    help
+        Set this to perform sanity checks when using the MQTT library.
 
 config AWS_IOT_MQTT_ENABLE_METRICS
     bool "Enable anonymous usage metrics"
     default n
+    help
+        Set this to enable anonymous metrics reporting to AWS IoT.
 
 config AWS_IOT_MQTT_ENABLE_SERIALIZER_OVERRIDES
     bool "Use custom serializer functions"
+    help
+        Set this to allow the MQTT packet serializer and deserializer
+        functions to be overridden.
 
 choice
     prompt "Log level"
     optional
     default AWS_IOT_LOG_LEVEL_MQTT_INFO
+    help
+        Set the log level of the MQTT library.
 config AWS_IOT_LOG_LEVEL_MQTT_NONE
     bool "None"
 config AWS_IOT_LOG_LEVEL_MQTT_ERROR
@@ -52,25 +66,36 @@ config AWS_IOT_MQTT_RESPONSE_WAIT_MS
     int "Response wait (ms)"
     default 10000
     range 0 3600000
+    help
+        A "reasonable amount of time" to wait for keep-alive responses
+        from the MQTT server.
 
 config AWS_IOT_MQTT_RETRY_MS_CEILING
     int "Retry Ceiling (ms)"
     default 60000
     range 0 3600000
+    help
+        Controls the maximum retry interval of QoS 1 PUBLISH retransmissions.
 
 if AWS_IOT_STATIC_MEMORY_ONLY
 config MAX_CONNECTIONS
     int "Max connections"
     default 1
     range 0 16
+    help
+        Number of MQTT connections that may be opened.
 
 config AWS_IOT_MQTT_MAX_IN_PROGRESS_OPERATIONS
     int "Max in-progress operations"
     default 10
+    help
+        Maximum number of MQTT operations that may be in-progress at any time.
 
 config AWS_IOT_MQTT_SUBSCRIPTIONS
     int "Max subscriptions"
     default 8
+    help
+        Maximum number of MQTT subscriptions at any time.
 endif  # AWS_IOT_STATIC_MEMORY
 endmenu  # MQTT
 
@@ -80,15 +105,23 @@ menu "Thing Shadows"
 config AWS_IOT_SHADOW_ENABLE_ASSERTS
     bool "Enable sanity checks"
     default y
+    help
+        Set this to perform sanity checks when using the Shadow library.
 
 config AWS_IOT_SHADOW_DEFAULT_MQTT_TIMEOUT_MS
     int "MQTT Timeout (ms)"
     default 5000
     range 0 3600000
+    help
+        Set the default timeout (in milliseconds) for MQTT library called
+        by the Shadow library.
 
 choice
     prompt "Log level"
+    optional
     default AWS_IOT_LOG_LEVEL_SHADOW_INFO
+    help
+        Set the log level of the Shadow library.
 config AWS_IOT_LOG_LEVEL_SHADOW_NONE
     bool "None"
 config AWS_IOT_LOG_LEVEL_SHADOW_ERROR
@@ -106,11 +139,15 @@ config AWS_IOT_SHADOW_MAX_IN_PROGRESS_OPERATIONS
     int "Max in-progress operations"
     default 10
     range 1 100
+    help
+        Maximum number of Shadow operations that may be in-progress at any time.
 
 config AWS_IOT_SHADOW_SUBSCRIPTIONS
     int "Max subscriptions"
     default 2
     range 1 100
+    help
+        Maximum number of Shadow subscriptions at any time.
 endif  # AWS_IOT_STATIC_MEMORY
 endmenu  # Thing Shadows
 
@@ -120,15 +157,23 @@ menu "Jobs"
 config AWS_IOT_JOBS_ENABLE_ASSERTS
     bool "Enable sanity checks"
     default y
+    help
+        Set this to perform sanity checks when using the Jobs library.
 
 config AWS_IOT_JOBS_DEFAULT_MQTT_TIMEOUT_MS
     int "MQTT Timeout (ms)"
     default 5000
     range 0 3600000
+    help
+        Set the default timeout (in milliseconds) for MQTT library called
+        by the Jobs library.
 
 choice
     prompt "Log level"
+    optional
     default AWS_IOT_LOG_LEVEL_JOBS_INFO
+    help
+        Set the log level of the Jobs library.
 config AWS_IOT_LOG_LEVEL_JOBS_NONE
     bool "None"
 config AWS_IOT_LOG_LEVEL_JOBS_ERROR
@@ -146,11 +191,16 @@ config AWS_IOT_JOBS_MAX_IN_PROGRESS_OPERATIONS
     int "Max in-progress operations"
     default 10
     range 1 100
+    help
+        Maximum number of Jobs operations that may be in-progress at
+        any time.
 
 config AWS_IOT_JOBS_SUBSCRIPTIONS
     int "Max subscriptions"
     default 2
     range 1 100
+    help
+        Maximum number of Jobs subscriptions at any time.
 endif  # AWS_IOT_STATIC_MEMORY
 endmenu  # Jobs
 
@@ -160,9 +210,13 @@ menu "Defender"
 config AWS_IOT_SECURE_SOCKETS_METRICS_ENABLED
     bool "Enable Secure sockets metrics"
     default n
+    help
+        Enable this to collect sockets metrics.
 
 choice
     prompt "Default serialization format"
+    help
+        Default format for metrics data serialization.
 config AWS_IOT_DEFENDER_FORMAT_CBOR
     bool "CBOR"
 endchoice
@@ -170,11 +224,15 @@ endchoice
 config AWS_IOT_DEFENDER_USE_LONG_TAG
     bool "Use long tag"
     default n
+    help
+        Use long tag or short tag for metrics report.
 
 config AWS_IOT_DEFENDER_DEFAULT_PERIOD_SECONDS
     int "Default period (s)"
     default 300
     range 1 86400
+    help
+        Default period if users don't provide their own.
 
 config AWS_IOT_DEFENDER_WAIT_SERVER_MAX_SECONDS
     int "Max server wait (s)"
@@ -185,16 +243,22 @@ config AWS_IOT_DEFENDER_MQTT_CONNECT_TIMEOUT_SECONDS
     int "Default MQTT connect timeout (s)"
     default 10
     range 1 3600
+    help
+        Default MQTT connect timeout.
 
 config AWS_IOT_DEFENDER_MQTT_SUBSCRIBE_TIMEOUT_SECONDS
     int "Default MQTT subscribe timeout (s)"
     default 10
     range 1 3600
+    help
+        Default MQTT subscribe timeout.
 
 config AWS_IOT_DEFENDER_MQTT_PUBLISH_TIMEOUT_SECONDS
     int "Default MQTT publish timeout (s)"
     default 10
     range 1 3600
+    help
+        Default MQTT publish timeout.
 endmenu  # Defender
 
 
@@ -203,21 +267,27 @@ menu "Containers"
 config AWS_IOT_CONTAINERS_ENABLE_ASSERTS
     bool "Enable sanity checks"
     default y
+    help
+        Set this to perform sanity checks when using linear containers.
 endmenu  # Containers
 
 
 
-menu "Static Memory"
 if AWS_IOT_STATIC_MEMORY_ONLY
+menu "Static Memory"
 config AWS_IOT_MESSAGE_BUFFERS
     int "Number of message buffers"
     default 8
+    help
+        The number of statically-allocated message buffers.
 
 config AWS_IOT_MESSAGE_BUFFER_SIZE
     int "Message buffer size"
     default 1024
-endif  # AWS_IOT_STATIC_MEMORY_ONLY
+    help
+        The size (in bytes) of each statically-allocated message buffer.
 endmenu  # Static Memory
+endif  # AWS_IOT_STATIC_MEMORY_ONLY
 
 
 
@@ -225,18 +295,30 @@ menu "Task Pool"
 config AWS_IOT_TASKPOOL_ENABLE_ASSERTS
     bool "Enable sanity checks"
     default y
+    help
+        Set this to 1 to perform sanity checks when using the task pool
+        library.
 
 config AWS_IOT_TASKPOOL_JOB_WAIT_TIMEOUT_MS
     int "Wait timeout (ms)"
     default 60000
+    help
+        Set this to the desired wait timeout in milliseconds for a worker
+        in the task pool to wait for an incoming job.
 
 config AWS_IOT_TASKPOOL_JOBS_RECYCLE_LIMIT
     int "Number of recycleable tasks"
     default 8
+    help
+        Set this to the number of recyclable tasks for the task pool to
+        cache.
 
 choice
     prompt "Log level"
+    optional
     default AWS_IOT_LOG_LEVEL_TASKPOOL_NONE
+    help
+        Set the log level of the task pool library.
 config AWS_IOT_LOG_LEVEL_TASKPOOL_NONE
     bool "None"
 config AWS_IOT_LOG_LEVEL_TASKPOOL_ERROR
@@ -255,7 +337,11 @@ endmenu  # Task Pool
 menu "Platform"
 choice
     prompt "Platform log level"
+    optional
     default AWS_IOT_LOG_LEVEL_PLATFORM_NONE
+    help
+        Set the log level of all platform components except the
+        networking component.
 config AWS_IOT_LOG_LEVEL_PLATFORM_NONE
     bool "None"
 config AWS_IOT_LOG_LEVEL_PLATFORM_ERROR
@@ -270,7 +356,10 @@ endchoice
 
 choice
     prompt "Network log level"
+    optional
     default AWS_IOT_LOG_LEVEL_NETWORK_INFO
+    help
+        Set the log level of the platform networking component.
 config AWS_IOT_LOG_LEVEL_NETWORK_NONE
     bool "None"
 config AWS_IOT_LOG_LEVEL_NETWORK_ERROR
@@ -294,8 +383,8 @@ endmenu  # Platform
 
 
 
-menu "Serializer"
 if AWS_IOT_STATIC_MEMORY_ONLY
+menu "Serializer"
 config AWS_IOT_SERIALIZER_CBOR_ENCODERS
     int "Number of CBOR encoders"
     default 10
@@ -311,7 +400,7 @@ config AWS_IOT_SERIALIZER_CBOR_VALUES
 config AWS_IOT_SERIALIZER_DECODER_OBJECTS
     int "Number of decoder objects"
     default 10
-endif  # AWS_IOT_STATIC_MEMORY
 endmenu  # Serializer
+endif  # AWS_IOT_STATIC_MEMORY
 
 endmenu  # AWS IoT
