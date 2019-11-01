@@ -6,6 +6,7 @@ idf_component_register(SRCS
                             "port/iot_clock_freertos.c"
                             "port/iot_threads_freertos.c"
                             "${ports}/common/src/iot_network_metrics.c"
+                            "${ports}/common/src/iot_network_mbedtls.c"
                             "${libs}/aws/common/src/aws_iot_operation.c"
                             "${libs}/aws/common/src/aws_iot_parser.c"
                             "${libs}/aws/common/src/aws_iot_subscription.c"

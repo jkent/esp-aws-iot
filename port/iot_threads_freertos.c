@@ -114,6 +114,8 @@ bool Iot_CreateDetachedThread( IotThreadRoutine_t threadRoutine,
         pThreadInfo->threadRoutine = threadRoutine;
         pThreadInfo->pArgument = pArgument;
 
+        IotLogDebug("Creating task with %d stack", stackSize);
+
         if( xTaskCreate( _threadRoutineWrapper,
                          "iot_thread",
                          stackSize,
