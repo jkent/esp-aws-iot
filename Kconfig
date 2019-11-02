@@ -381,26 +381,4 @@ config AWS_IOT_THREAD_DEFAULT_PRIORITY
     default "5"
 endmenu  # Platform
 
-
-
-if AWS_IOT_STATIC_MEMORY_ONLY
-menu "Serializer"
-config AWS_IOT_SERIALIZER_CBOR_ENCODERS
-    int "Number of CBOR encoders"
-    default 10
-
-config AWS_IOT_SERIALIZER_CBOR_PARSERS
-    int "Number of CBOR parsers"
-    default 10
-
-config AWS_IOT_SERIALIZER_CBOR_VALUES
-    int "Number of CBOR values"
-    default 10
-
-config AWS_IOT_SERIALIZER_DECODER_OBJECTS
-    int "Number of decoder objects"
-    default 10
-endmenu  # Serializer
-endif  # AWS_IOT_STATIC_MEMORY
-
 endmenu  # AWS IoT
