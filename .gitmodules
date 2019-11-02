@@ -1,3 +1,3 @@
 [submodule "aws-iot-device-sdk-embedded-C"]
 	path = aws-iot-device-sdk-embedded-C
-	url = git@github.com:jkent/aws-iot-device-sdk-embedded-C.git
+	url = https://github.com/jkent/aws-iot-device-sdk-embedded-C.git
